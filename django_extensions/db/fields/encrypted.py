@@ -60,16 +60,16 @@ class BaseEncryptedField(models.Field):
     def get_db_prep_value(self, value, connection, prepared=False):
         # Truncated encrypted content is unreadable,
         # so truncate before encryption
-        max_length = self.unencrypted_length
-        if max_length and value and len(value) > max_length:
-            warnings.warn("Truncating field %s from %d to %d bytes" % (
-                self.name, len(value), max_length), EncryptionWarning
-            )
-            value = value[:max_length]
+        if value is not None:
+            max_length = self.unencrypted_length
+            if max_length and len(value) > max_length:
+                warnings.warn("Truncating field %s from %d to %d bytes" % (
+                    self.name, len(value), max_length), EncryptionWarning
+                )
+                value = value[:max_length]
 
-        encrypted_data = self.fernet.encrypt(value.encode())
-        value = base64.urlsafe_b64encode(encrypted_data).decode()
-
+            encrypted_data = self.fernet.encrypt(value.encode())
+            value = base64.urlsafe_b64encode(encrypted_data).decode()
         return value
 
     def deconstruct(self):
