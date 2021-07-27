@@ -47,7 +47,11 @@ class BaseEncryptedField(models.Field):
     def to_python(self, value):
         if value:
             decrypted_text = self.fernet.decrypt(
-                base64.urlsafe_b64decode(value)
+                # Hack to prevent "binascii.Error: Incorrect padding"
+                # See https://gist.github.com/perrygeo/ee7c65bb1541ff6ac770
+                # b64decode() ignores extraneous padding, which is why adding extra padding works
+                # to prevent this error
+                base64.urlsafe_b64decode(value + "===")
             )
             retval = decrypted_text.decode()
         else:
