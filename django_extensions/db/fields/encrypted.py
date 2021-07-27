@@ -61,7 +61,7 @@ class BaseEncryptedField(models.Field):
         # Truncated encrypted content is unreadable,
         # so truncate before encryption
         max_length = self.unencrypted_length
-        if max_length and len(value) > max_length:
+        if max_length and value and len(value) > max_length:
             warnings.warn("Truncating field %s from %d to %d bytes" % (
                 self.name, len(value), max_length), EncryptionWarning
             )
